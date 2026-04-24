@@ -1,0 +1,122 @@
+{
+  "id": "it-terms",
+  "title": "IT Terms",
+  "description": "開発と運用で使うIT用語",
+  "version": 1,
+  "lang": "en-ja",
+  "items": [
+    {
+      "id": "it-terms-0001",
+      "question": "API",
+      "answer": "アプリケーション間の接続仕様",
+      "choices": ["画像圧縮方式", "アプリケーション間の接続仕様", "暗号鍵", "画面部品"],
+      "tags": ["web"],
+      "note": "Application Programming Interface の略。"
+    },
+    {
+      "id": "it-terms-0002",
+      "question": "cache",
+      "answer": "再利用のために一時保存するデータ",
+      "choices": ["再利用のために一時保存するデータ", "削除済みデータ", "認証方式", "画面遷移"],
+      "tags": ["performance"]
+    },
+    {
+      "id": "it-terms-0003",
+      "question": "IndexedDB",
+      "answer": "ブラウザ内の構造化データベース",
+      "choices": ["CSSの仕様", "ブラウザ内の構造化データベース", "画像形式", "HTTPヘッダー"],
+      "tags": ["browser"]
+    },
+    {
+      "id": "it-terms-0004",
+      "question": "Service Worker",
+      "answer": "ブラウザで動くバックグラウンドスクリプト",
+      "choices": ["SQLの種類", "ブラウザで動くバックグラウンドスクリプト", "入力フォーム", "DNSレコード"],
+      "tags": ["pwa"]
+    },
+    {
+      "id": "it-terms-0005",
+      "question": "manifest",
+      "answer": "PWAの名前やアイコンなどを定義するファイル",
+      "choices": ["ログの保存先", "PWAの名前やアイコンなどを定義するファイル", "暗号化方式", "テスト結果"],
+      "tags": ["pwa"]
+    },
+    {
+      "id": "it-terms-0006",
+      "question": "SPA",
+      "answer": "単一ページで画面を切り替えるWebアプリ",
+      "choices": ["単一ページで画面を切り替えるWebアプリ", "画像編集ソフト", "サーバー証明書", "圧縮アルゴリズム"],
+      "tags": ["frontend"]
+    },
+    {
+      "id": "it-terms-0007",
+      "question": "repository",
+      "answer": "データ入出力を担当する層",
+      "choices": ["配色ルール", "データ入出力を担当する層", "画面幅", "メールアドレス"],
+      "tags": ["architecture"]
+    },
+    {
+      "id": "it-terms-0008",
+      "question": "transaction",
+      "answer": "一連の処理をまとめて扱う単位",
+      "choices": ["一連の処理をまとめて扱う単位", "文字サイズ", "翻訳ファイル", "検索順位"],
+      "tags": ["database"]
+    },
+    {
+      "id": "it-terms-0009",
+      "question": "routing",
+      "answer": "URLに応じて画面や処理を選ぶ仕組み",
+      "choices": ["URLに応じて画面や処理を選ぶ仕組み", "画像の切り抜き", "端末の充電", "音声再生"],
+      "tags": ["frontend"]
+    },
+    {
+      "id": "it-terms-0010",
+      "question": "runtime cache",
+      "answer": "実行時に取得したデータのキャッシュ",
+      "choices": ["実行時に取得したデータのキャッシュ", "初期化処理", "配列の並び替え", "文字コード"],
+      "tags": ["pwa"]
+    },
+    {
+      "id": "it-terms-0011",
+      "question": "JSON",
+      "answer": "軽量なデータ交換形式",
+      "choices": ["軽量なデータ交換形式", "通信回線", "デザインツール", "入力装置"],
+      "tags": ["data"]
+    },
+    {
+      "id": "it-terms-0012",
+      "question": "TypeScript",
+      "answer": "JavaScriptに型を加えた言語",
+      "choices": ["JavaScriptに型を加えた言語", "データベース", "クラウドサービス", "画像形式"],
+      "tags": ["language"]
+    },
+    {
+      "id": "it-terms-0013",
+      "question": "component",
+      "answer": "UIを構成する再利用可能な部品",
+      "choices": ["UIを構成する再利用可能な部品", "ネットワーク機器", "暗号鍵", "画像の解像度"],
+      "tags": ["frontend"]
+    },
+    {
+      "id": "it-terms-0014",
+      "question": "build",
+      "answer": "配信用にソースを変換する処理",
+      "choices": ["配信用にソースを変換する処理", "画面を閉じる処理", "入力値の削除", "検索条件"],
+      "tags": ["tooling"]
+    },
+    {
+      "id": "it-terms-0015",
+      "question": "deploy",
+      "answer": "アプリを配信環境へ反映すること",
+      "choices": ["アプリを配信環境へ反映すること", "配列を結合すること", "文字を翻訳すること", "画像を選ぶこと"],
+      "tags": ["operations"]
+    },
+    {
+      "id": "it-terms-0016",
+      "question": "offline first",
+      "answer": "通信がなくても使えることを優先する設計",
+      "choices": ["通信がなくても使えることを優先する設計", "常にサーバーへ保存する設計", "音声入力だけの設計", "画像を多く使う設計"],
+      "tags": ["pwa"]
+    }
+  ]
+}

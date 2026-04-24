@@ -1,0 +1,192 @@
+import { useEffect, useState } from 'react'
+import { ErrorState, LoadingState } from '../../components/PageStates'
+import { RouterLink } from '../../components/RouterLink'
+import { formatDateTime, formatPercent } from '../../lib/utils/format'
+import { fetchDeckSummaries } from '../../repositories/deckRepository'
+import { getDeckProgressMap } from '../../repositories/progressRepository'
+import { deckDetailPath, studyPath, testPath } from '../../routes/router'
+import type { DeckProgress, DeckSummary } from '../../types'
+
+type DecksState =
+  | { status: 'loading' }
+  | {
+      status: 'ready'
+      decks: DeckSummary[]
+      progressMap: Map<string, DeckProgress>
+    }
+  | { status: 'error'; message: string }
+
+interface DecksPageProps {
+  variant: 'home' | 'list'
+}
+
+function getLastActivity(progress: DeckProgress | undefined) {
+  if (!progress) {
+    return 0
+  }
+
+  return Math.max(progress.lastStudiedAt, progress.lastTestedAt)
+}
+
+export function DecksPage({ variant }: DecksPageProps) {
+  const [state, setState] = useState<DecksState>({ status: 'loading' })
+  const [reloadKey, setReloadKey] = useState(0)
+
+  useEffect(() => {
+    let active = true
+
+    async function load() {
+      setState({ status: 'loading' })
+
+      try {
+        const [decks, progressMap] = await Promise.all([
+          fetchDeckSummaries(),
+          getDeckProgressMap(),
+        ])
+
+        if (active) {
+          setState({ status: 'ready', decks, progressMap })
+        }
+      } catch (error) {
+        if (active) {
+          setState({
+            status: 'error',
+            message:
+              error instanceof Error ? error.message : '不明なエラーです。',
+          })
+        }
+      }
+    }
+
+    void load()
+    return () => {
+      active = false
+    }
+  }, [reloadKey])
+
+  if (state.status === 'loading') {
+    return <LoadingState label="単語帳を読み込み中" />
+  }
+
+  if (state.status === 'error') {
+    return (
+      <ErrorState
+        message={state.message}
+        onRetry={() => setReloadKey((value) => value + 1)}
+      />
+    )
+  }
+
+  const totals = state.decks.reduce(
+    (summary, deck) => {
+      const progress = state.progressMap.get(deck.id)
+      return {
+        words: summary.words + deck.itemCount,
+        studied: summary.studied + (progress?.totalStudied ?? 0),
+        correct: summary.correct + (progress?.totalCorrect ?? 0),
+        answered: summary.answered + (progress?.totalAnswered ?? 0),
+      }
+    },
+    { words: 0, studied: 0, correct: 0, answered: 0 },
+  )
+  const recentDeck = [...state.decks].sort(
+    (left, right) =>
+      getLastActivity(state.progressMap.get(right.id)) -
+      getLastActivity(state.progressMap.get(left.id)),
+  )[0]
+
+  return (
+    <section className="page-stack">
+      <div className="hero-band">
+        <div>
+          <p className="eyebrow">Local first vocabulary trainer</p>
+          <h1>{variant === 'home' ? 'My Words' : '単語帳'}</h1>
+          <p className="lead">
+            単語帳を選び、学習とテストの進捗をこの端末に保存します。
+          </p>
+        </div>
+        <div className="hero-metrics" aria-label="全体の学習状況">
+          <div>
+            <span>{state.decks.length}</span>
+            <small>単語帳</small>
+          </div>
+          <div>
+            <span>
+              {totals.studied}/{totals.words}
+            </span>
+            <small>学習済み</small>
+          </div>
+          <div>
+            <span>{formatPercent(totals.correct, totals.answered)}</span>
+            <small>正答率</small>
+          </div>
+        </div>
+      </div>
+
+      {recentDeck && getLastActivity(state.progressMap.get(recentDeck.id)) > 0 ? (
+        <section className="resume-strip" aria-label="最近の学習">
+          <div>
+            <span className="section-kicker">最近</span>
+            <strong>{recentDeck.title}</strong>
+            <small>
+              {formatDateTime(getLastActivity(state.progressMap.get(recentDeck.id)))}
+            </small>
+          </div>
+          <div className="action-row">
+            <RouterLink className="button button--primary" to={studyPath(recentDeck.id)}>
+              学習
+            </RouterLink>
+            <RouterLink className="button button--secondary" to={testPath(recentDeck.id)}>
+              テスト
+            </RouterLink>
+          </div>
+        </section>
+      ) : null}
+
+      <section className="deck-grid" aria-label="単語帳一覧">
+        {state.decks.map((deck) => {
+          const progress = state.progressMap.get(deck.id)
+          const accuracy = formatPercent(
+            progress?.totalCorrect ?? 0,
+            progress?.totalAnswered ?? 0,
+          )
+
+          return (
+            <article className="deck-card" key={deck.id}>
+              <div className="deck-card__body">
+                <span className="deck-version">v{deck.version}</span>
+                <h2>{deck.title}</h2>
+                <p>{deck.description}</p>
+                <dl className="mini-stats">
+                  <div>
+                    <dt>語数</dt>
+                    <dd>{deck.itemCount}</dd>
+                  </div>
+                  <div>
+                    <dt>学習済み</dt>
+                    <dd>{progress?.totalStudied ?? 0}</dd>
+                  </div>
+                  <div>
+                    <dt>正答率</dt>
+                    <dd>{accuracy}</dd>
+                  </div>
+                </dl>
+              </div>
+              <div className="deck-card__actions">
+                <RouterLink className="button button--ghost" to={deckDetailPath(deck.id)}>
+                  詳細
+                </RouterLink>
+                <RouterLink className="button button--primary" to={studyPath(deck.id)}>
+                  学習
+                </RouterLink>
+                <RouterLink className="button button--secondary" to={testPath(deck.id)}>
+                  テスト
+                </RouterLink>
+              </div>
+            </article>
+          )
+        })}
+      </section>
+    </section>
+  )
+}

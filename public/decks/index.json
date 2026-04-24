@@ -1,0 +1,16 @@
+[
+  {
+    "id": "basic-english",
+    "title": "Basic English",
+    "description": "日常で使う基本英単語",
+    "version": 1,
+    "itemCount": 20
+  },
+  {
+    "id": "it-terms",
+    "title": "IT Terms",
+    "description": "開発と運用で使うIT用語",
+    "version": 1,
+    "itemCount": 16
+  }
+]
