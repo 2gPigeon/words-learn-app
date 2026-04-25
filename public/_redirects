@@ -1,1 +1,2 @@
-/* /index.html 200
+# SPA fallback is configured in wrangler.toml.
+# Do not add "/* /index.html 200" here for Cloudflare Workers static assets.
