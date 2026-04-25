@@ -1,16 +1,23 @@
 [
   {
-    "id": "basic-english",
-    "title": "Basic English",
-    "description": "日常で使う基本英単語",
+    "id": "junior-highschool-words",
+    "title": "Junior High School Words",
+    "description": "中学校で習う英単語",
     "version": 1,
-    "itemCount": 20
+    "itemCount": 1666
   },
   {
-    "id": "it-terms",
-    "title": "IT Terms",
-    "description": "開発と運用で使うIT用語",
+    "id": "adjectives",
+    "title": "形容詞",
+    "description": "中学で習う形容詞",
     "version": 1,
-    "itemCount": 16
+    "itemCount": 353
+  },
+  {
+    "id": "verbs",
+    "title": "動詞",
+    "description": "中学で習う動詞",
+    "version": 1,
+    "itemCount": 346
   }
 ]

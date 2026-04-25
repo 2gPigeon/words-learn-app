@@ -1,6 +1,9 @@
 import type { SortMode, WordItem, WordProgress } from '../types'
 
-function shuffleItems(items: WordItem[]) {
+const DEFAULT_CHOICE_COUNT = 4
+const MINIMUM_CHOICE_COUNT = 2
+
+function shuffleItems<T>(items: T[]) {
   const copy = [...items]
 
   for (let index = copy.length - 1; index > 0; index -= 1) {
@@ -13,6 +16,69 @@ function shuffleItems(items: WordItem[]) {
 
 function getProgressMap(progress: WordProgress[]) {
   return new Map(progress.map((item) => [item.wordId, item]))
+}
+
+function hasUsableChoices(item: WordItem) {
+  return (
+    Array.isArray(item.choices) &&
+    item.choices.length >= MINIMUM_CHOICE_COUNT &&
+    item.choices.includes(item.answer)
+  )
+}
+
+function buildChoices(item: WordItem, allItems: WordItem[]) {
+  if (hasUsableChoices(item)) {
+    return item.choices
+  }
+
+  const choices: string[] = []
+  const seen = new Set<string>()
+
+  for (const choice of item.choices ?? []) {
+    if (!choice || seen.has(choice)) {
+      continue
+    }
+
+    choices.push(choice)
+    seen.add(choice)
+  }
+
+  if (!seen.has(item.answer)) {
+    choices.push(item.answer)
+    seen.add(item.answer)
+  }
+
+  const distractors = shuffleItems(
+    allItems
+      .filter((candidate) => candidate.id !== item.id)
+      .map((candidate) => candidate.answer),
+  )
+
+  for (const distractor of distractors) {
+    if (seen.has(distractor)) {
+      continue
+    }
+
+    choices.push(distractor)
+    seen.add(distractor)
+
+    if (choices.length >= DEFAULT_CHOICE_COUNT) {
+      break
+    }
+  }
+
+  if (choices.length < MINIMUM_CHOICE_COUNT) {
+    return undefined
+  }
+
+  return shuffleItems(choices).slice(0, DEFAULT_CHOICE_COUNT)
+}
+
+function attachChoices(items: WordItem[], allItems: WordItem[]) {
+  return items.map((item) => ({
+    ...item,
+    choices: buildChoices(item, allItems),
+  }))
 }
 
 function scoreItem(
@@ -49,18 +115,21 @@ export function selectTestItems(
   sortMode: SortMode,
 ) {
   if (sortMode === 'random') {
-    return shuffleItems(items).slice(0, count)
+    return attachChoices(shuffleItems(items).slice(0, count), items)
   }
 
   const progressMap = getProgressMap(progress)
   const now = Date.now()
 
-  return [...items]
+  return attachChoices(
+    [...items]
     .sort((left, right) => {
       return (
         scoreItem(right, progressMap, sortMode, now) -
         scoreItem(left, progressMap, sortMode, now)
       )
     })
-    .slice(0, count)
+    .slice(0, count),
+    items,
+  )
 }
