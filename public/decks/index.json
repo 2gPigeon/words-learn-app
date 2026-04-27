@@ -1,12 +1,5 @@
 [
   {
-    "id": "junior-highschool-words",
-    "title": "Junior High School Words",
-    "description": "中学校で習う英単語",
-    "version": 1,
-    "itemCount": 1666
-  },
-  {
     "id": "adjectives",
     "title": "形容詞",
     "description": "中学で習う形容詞",

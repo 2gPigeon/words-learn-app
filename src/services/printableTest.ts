@@ -253,7 +253,7 @@ function buildPrintableHtml(deck: Deck, items: WordItem[]) {
     <main class="page">
       <header class="page__header">
         <div class="page__title">
-          <h1>${escapeHtml(deck.title)} Fold Test</h1>
+          <h1>${escapeHtml(deck.title)} テスト</h1>
           <div class="page__meta">${generatedAt}</div>
         </div>
         <div class="page__info">
@@ -265,14 +265,13 @@ function buildPrintableHtml(deck: Deck, items: WordItem[]) {
       <section class="page__halves">
         <section class="sheet sheet--answers" aria-label="Answer key">
           <div class="sheet__heading">
-            <h2>Answer Key</h2>
-            <span class="sheet__label">Upper half</span>
+            <h2>答え</h2>
           </div>
           <table>
             <thead>
               <tr>
-                <th>Japanese meaning</th>
-                <th>English answer</th>
+                <th>意味</th>
+                <th>英単語</th>
               </tr>
             </thead>
             <tbody>
@@ -285,14 +284,13 @@ function buildPrintableHtml(deck: Deck, items: WordItem[]) {
 
         <section class="sheet sheet--test" aria-label="Printable vocabulary test">
           <div class="sheet__heading">
-            <h2>Test</h2>
-            <span class="sheet__label">Lower half</span>
+            <h2>テスト</h2>
           </div>
           <table>
             <thead>
               <tr>
-                <th>Japanese meaning</th>
-                <th>English</th>
+                <th>意味</th>
+                <th>英単語</th>
               </tr>
             </thead>
             <tbody>
@@ -301,8 +299,6 @@ function buildPrintableHtml(deck: Deck, items: WordItem[]) {
           </table>
         </section>
       </section>
-
-      <p class="page__hint">Print or save as PDF, then fold the sheet along the center line.</p>
     </main>
 
     <script>
