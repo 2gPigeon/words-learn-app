@@ -1,12 +1,30 @@
 import { useCallback, useEffect, useState } from 'react'
-import { parseRoute } from '../routes/router'
+import { decksPath, parseRoute } from '../routes/router'
+
+function normalizePathname(pathname: string) {
+  return pathname === '/' ? decksPath() : pathname
+}
 
 export function useRoute() {
-  const [route, setRoute] = useState(() => parseRoute(window.location.pathname))
+  const [route, setRoute] = useState(() => {
+    const pathname = normalizePathname(window.location.pathname)
+
+    if (pathname !== window.location.pathname) {
+      window.history.replaceState(null, '', pathname)
+    }
+
+    return parseRoute(pathname)
+  })
 
   useEffect(() => {
     const handlePopState = () => {
-      setRoute(parseRoute(window.location.pathname))
+      const pathname = normalizePathname(window.location.pathname)
+
+      if (pathname !== window.location.pathname) {
+        window.history.replaceState(null, '', pathname)
+      }
+
+      setRoute(parseRoute(pathname))
     }
 
     window.addEventListener('popstate', handlePopState)
@@ -15,8 +33,10 @@ export function useRoute() {
 
   const navigate = useCallback((path: string) => {
     const url = new URL(path, window.location.href)
-    window.history.pushState(null, '', url.pathname)
-    setRoute(parseRoute(url.pathname))
+    const pathname = normalizePathname(url.pathname)
+
+    window.history.pushState(null, '', pathname)
+    setRoute(parseRoute(pathname))
     window.scrollTo({ top: 0, behavior: 'auto' })
   }, [])
 

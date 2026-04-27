@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { RouterLink } from '../components/RouterLink'
 import { useOnlineStatus } from '../hooks/useOnlineStatus'
-import type { AppRoute } from '../routes/router'
+import { decksPath, type AppRoute } from '../routes/router'
 
 interface AppShellProps {
   route: AppRoute
@@ -11,7 +11,6 @@ interface AppShellProps {
 function isActive(route: AppRoute, target: 'decks' | 'history' | 'settings') {
   if (target === 'decks') {
     return (
-      route.name === 'home' ||
       route.name === 'decks' ||
       route.name === 'deckDetail' ||
       route.name === 'study' ||
@@ -28,7 +27,7 @@ export function AppShell({ route, children }: AppShellProps) {
   return (
     <div className="app-shell">
       <header className="app-header">
-        <RouterLink className="brand" to="/" aria-label="ホーム">
+        <RouterLink className="brand" to={decksPath()} aria-label="ホーム">
           <span className="brand__mark" aria-hidden="true">
             W
           </span>
@@ -37,7 +36,7 @@ export function AppShell({ route, children }: AppShellProps) {
         <nav className="main-nav" aria-label="主要ナビゲーション">
           <RouterLink
             className={isActive(route, 'decks') ? 'active' : undefined}
-            to="/decks"
+            to={decksPath()}
           >
             単語帳
           </RouterLink>

@@ -16,10 +16,6 @@ type DecksState =
     }
   | { status: 'error'; message: string }
 
-interface DecksPageProps {
-  variant: 'home' | 'list'
-}
-
 function getLastActivity(progress: DeckProgress | undefined) {
   if (!progress) {
     return 0
@@ -28,7 +24,7 @@ function getLastActivity(progress: DeckProgress | undefined) {
   return Math.max(progress.lastStudiedAt, progress.lastTestedAt)
 }
 
-export function DecksPage({ variant }: DecksPageProps) {
+export function DecksPage() {
   const [state, setState] = useState<DecksState>({ status: 'loading' })
   const [reloadKey, setReloadKey] = useState(0)
 
@@ -100,7 +96,7 @@ export function DecksPage({ variant }: DecksPageProps) {
       <div className="hero-band">
         <div>
           <p className="eyebrow">Local first vocabulary trainer</p>
-          <h1>{variant === 'home' ? 'My Words' : '単語帳'}</h1>
+          <h1>単語帳</h1>
           <p className="lead">
             単語帳を選び、学習とテストの進捗をこの端末に保存します。
           </p>

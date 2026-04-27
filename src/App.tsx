@@ -12,6 +12,7 @@ import { TestPage } from './features/test/TestPage'
 import { useRoute } from './hooks/useRoute'
 import { getSettings } from './repositories/progressRepository'
 import { NavigationProvider } from './routes/NavigationContext'
+import { decksPath } from './routes/router'
 import { DEFAULT_SETTINGS, type AppSettings } from './types'
 import './App.css'
 
@@ -19,8 +20,8 @@ function NotFoundPage() {
   return (
     <section className="state-panel">
       <h1>ページが見つかりません</h1>
-      <RouterLink className="button button--primary" to="/">
-        ホームへ
+      <RouterLink className="button button--primary" to={decksPath()}>
+        単語帳へ
       </RouterLink>
     </section>
   )
@@ -68,10 +69,8 @@ function App() {
 
   function renderRoute() {
     switch (route.name) {
-      case 'home':
-        return <DecksPage variant="home" />
       case 'decks':
-        return <DecksPage variant="list" />
+        return <DecksPage />
       case 'deckDetail':
         return <DeckDetailPage deckId={route.deckId} />
       case 'study':

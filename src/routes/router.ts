@@ -1,5 +1,4 @@
 export type AppRoute =
-  | { name: 'home' }
   | { name: 'decks' }
   | { name: 'deckDetail'; deckId: string }
   | { name: 'study'; deckId: string }
@@ -17,7 +16,7 @@ export function parseRoute(pathname: string): AppRoute {
   const segments = compactSegments(pathname)
 
   if (segments.length === 0) {
-    return { name: 'home' }
+    return { name: 'decks' }
   }
 
   if (segments.length === 1 && segments[0] === 'decks') {
@@ -49,6 +48,10 @@ export function parseRoute(pathname: string): AppRoute {
   }
 
   return { name: 'notFound' }
+}
+
+export function decksPath() {
+  return '/decks'
 }
 
 export function deckDetailPath(deckId: string) {
