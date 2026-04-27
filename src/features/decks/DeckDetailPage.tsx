@@ -2,9 +2,10 @@ import { useEffect, useMemo, useState } from 'react'
 import { ErrorState, LoadingState } from '../../components/PageStates'
 import { ProgressBar } from '../../components/ProgressBar'
 import { RouterLink } from '../../components/RouterLink'
-import { familiarityLabels } from '../../services/mastery'
 import { fetchDeck } from '../../repositories/deckRepository'
 import { getWordProgressForDeck } from '../../repositories/progressRepository'
+import { familiarityLabels } from '../../services/mastery'
+import { openPrintableTest } from '../../services/printableTest'
 import { studyPath, testPath } from '../../routes/router'
 import type { Deck, WordProgress } from '../../types'
 
@@ -41,7 +42,9 @@ export function DeckDetailPage({ deckId }: DeckDetailPageProps) {
           setState({
             status: 'error',
             message:
-              error instanceof Error ? error.message : '不明なエラーです。',
+              error instanceof Error
+                ? error.message
+                : 'デッキを読み込めませんでした。',
           })
         }
       }
@@ -62,7 +65,7 @@ export function DeckDetailPage({ deckId }: DeckDetailPageProps) {
   }, [state])
 
   if (state.status === 'loading') {
-    return <LoadingState label="単語帳を読み込み中" />
+    return <LoadingState label="デッキを読み込み中" />
   }
 
   if (state.status === 'error') {
@@ -74,35 +77,48 @@ export function DeckDetailPage({ deckId }: DeckDetailPageProps) {
     )
   }
 
-  const studied = state.progress.filter((item) => item.lastAnsweredAt !== null)
+  const readyState = state
+  const studied = readyState.progress.filter((item) => item.lastAnsweredAt !== null)
     .length
-  const weak = state.progress.filter(
+  const weak = readyState.progress.filter(
     (item) => item.wrongCount > 0 && item.familiarity <= 1,
   ).length
+
+  function handleOpenPrintableTest() {
+    try {
+      openPrintableTest(readyState.deck)
+    } catch (error) {
+      window.alert(
+        error instanceof Error
+          ? error.message
+          : '印刷用テストを開けませんでした。',
+      )
+    }
+  }
 
   return (
     <section className="page-stack">
       <div className="page-heading">
-        <p className="eyebrow">{state.deck.lang}</p>
-        <h1>{state.deck.title}</h1>
-        <p className="lead">{state.deck.description}</p>
+        <p className="eyebrow">{readyState.deck.lang}</p>
+        <h1>{readyState.deck.title}</h1>
+        <p className="lead">{readyState.deck.description}</p>
       </div>
 
       <section className="detail-layout">
         <div className="panel">
-          <ProgressBar value={studied} max={state.deck.items.length} label="学習済み" />
+          <ProgressBar value={studied} max={readyState.deck.items.length} label="学習済み" />
           <dl className="detail-stats">
             <div>
-              <dt>総問題数</dt>
-              <dd>{state.deck.items.length}</dd>
+              <dt>単語数</dt>
+              <dd>{readyState.deck.items.length}</dd>
             </div>
             <div>
               <dt>苦手語</dt>
               <dd>{weak}</dd>
             </div>
             <div>
-              <dt>データ版</dt>
-              <dd>v{state.deck.version}</dd>
+              <dt>デッキ版</dt>
+              <dd>v{readyState.deck.version}</dd>
             </div>
           </dl>
           <div className="action-row">
@@ -112,16 +128,23 @@ export function DeckDetailPage({ deckId }: DeckDetailPageProps) {
             <RouterLink className="button button--secondary" to={testPath(deckId)}>
               テストする
             </RouterLink>
+            <button
+              className="button button--ghost"
+              type="button"
+              onClick={handleOpenPrintableTest}
+            >
+              印刷テスト
+            </button>
           </div>
         </div>
 
         <div className="panel">
           <div className="section-title">
             <span className="section-kicker">Words</span>
-            <h2>収録単語</h2>
+            <h2>単語一覧</h2>
           </div>
           <div className="word-list">
-            {state.deck.items.slice(0, 12).map((item) => {
+            {readyState.deck.items.slice(0, 12).map((item) => {
               const progress = progressMap.get(item.id)
 
               return (
