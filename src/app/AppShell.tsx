@@ -22,11 +22,16 @@ function isActive(route: AppRoute, target: 'decks' | 'history' | 'settings') {
   return route.name === target
 }
 
+function isFocusMode(route: AppRoute) {
+  return route.name === 'test'
+}
+
 export function AppShell({ route, children }: AppShellProps) {
   const isOnline = useOnlineStatus()
+  const focusMode = isFocusMode(route)
 
   return (
-    <div className="app-shell">
+    <div className={focusMode ? 'app-shell app-shell--focus' : 'app-shell'}>
       <header className="app-header">
         <RouterLink className="brand" to={decksPath()} aria-label="ホーム">
           <span className="brand__mark" aria-hidden="true">

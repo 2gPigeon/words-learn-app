@@ -742,6 +742,42 @@ dd {
     padding-top: 20px;
   }
 
+  .app-shell--focus main {
+    width: min(100% - 16px, 1120px);
+    padding-top: 12px;
+    padding-bottom: calc(16px + env(safe-area-inset-bottom));
+  }
+
+  .app-shell--focus .page-stack {
+    gap: 12px;
+  }
+
+  .app-shell--focus .page-heading--split,
+  .app-shell--focus .test-card__topline {
+    display: none;
+  }
+
+  .app-shell--focus .test-card {
+    gap: 14px;
+    padding: 16px 14px calc(14px + env(safe-area-inset-bottom));
+  }
+
+  .app-shell--focus .test-card h2 {
+    font-size: 30px;
+  }
+
+  .app-shell--focus .feedback {
+    padding: 12px;
+  }
+
+  .app-shell--focus .action-row--right {
+    position: sticky;
+    bottom: 0;
+    padding-top: 10px;
+    padding-bottom: env(safe-area-inset-bottom);
+    background: linear-gradient(180deg, transparent 0%, var(--surface) 22px);
+  }
+
   .app-header {
     padding: 12px;
   }
