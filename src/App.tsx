@@ -5,6 +5,10 @@ import { RouterLink } from './components/RouterLink'
 import { DeckDetailPage } from './features/decks/DeckDetailPage'
 import { DecksPage } from './features/decks/DecksPage'
 import { HistoryPage } from './features/history/HistoryPage'
+import { IrregularVerbDetailPage } from './features/irregular-verbs/IrregularVerbDetailPage'
+import { IrregularVerbResultPage } from './features/irregular-verbs/IrregularVerbResultPage'
+import { IrregularVerbTestPage } from './features/irregular-verbs/IrregularVerbTestPage'
+import { isIrregularVerbDeckId } from './features/irregular-verbs/constants'
 import { SettingsPage } from './features/settings/SettingsPage'
 import { StudyPage } from './features/study/StudyPage'
 import { ResultPage } from './features/test/ResultPage'
@@ -72,13 +76,24 @@ function App() {
       case 'decks':
         return <DecksPage />
       case 'deckDetail':
+        if (isIrregularVerbDeckId(route.deckId)) {
+          return <IrregularVerbDetailPage deckId={route.deckId} />
+        }
         return <DeckDetailPage deckId={route.deckId} />
       case 'study':
+        if (isIrregularVerbDeckId(route.deckId)) {
+          return <IrregularVerbDetailPage deckId={route.deckId} />
+        }
         return <StudyPage deckId={route.deckId} />
       case 'test':
+        if (isIrregularVerbDeckId(route.deckId)) {
+          return <IrregularVerbTestPage deckId={route.deckId} />
+        }
         return <TestPage deckId={route.deckId} />
       case 'result':
         return <ResultPage sessionId={route.sessionId} />
+      case 'irregularVerbResult':
+        return <IrregularVerbResultPage sessionId={route.sessionId} />
       case 'history':
         return <HistoryPage />
       case 'settings':

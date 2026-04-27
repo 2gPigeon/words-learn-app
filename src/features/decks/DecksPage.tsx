@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { ErrorState, LoadingState } from '../../components/PageStates'
 import { RouterLink } from '../../components/RouterLink'
+import { isIrregularVerbDeckId } from '../../features/irregular-verbs/constants'
 import { formatDateTime, formatPercent } from '../../lib/utils/format'
 import { fetchDeckSummaries } from '../../repositories/deckRepository'
 import { getDeckProgressMap } from '../../repositories/progressRepository'
@@ -48,7 +49,9 @@ export function DecksPage() {
           setState({
             status: 'error',
             message:
-              error instanceof Error ? error.message : '不明なエラーです。',
+              error instanceof Error
+                ? error.message
+                : 'デッキを読み込めませんでした。',
           })
         }
       }
@@ -61,7 +64,7 @@ export function DecksPage() {
   }, [reloadKey])
 
   if (state.status === 'loading') {
-    return <LoadingState label="単語帳を読み込み中" />
+    return <LoadingState label="デッキを読み込み中" />
   }
 
   if (state.status === 'error') {
@@ -98,13 +101,13 @@ export function DecksPage() {
           <p className="eyebrow">Local first vocabulary trainer</p>
           <h1>単語帳</h1>
           <p className="lead">
-            単語帳を選び、学習とテストの進捗をこの端末に保存します。
+            通常単語と不規則動詞の両方を、この端末に進捗保存しながら学習できます。
           </p>
         </div>
         <div className="hero-metrics" aria-label="全体の学習状況">
           <div>
             <span>{state.decks.length}</span>
-            <small>単語帳</small>
+            <small>デッキ数</small>
           </div>
           <div>
             <span>
@@ -114,7 +117,7 @@ export function DecksPage() {
           </div>
           <div>
             <span>{formatPercent(totals.correct, totals.answered)}</span>
-            <small>正答率</small>
+            <small>正解率</small>
           </div>
         </div>
       </div>
@@ -122,16 +125,28 @@ export function DecksPage() {
       {recentDeck && getLastActivity(state.progressMap.get(recentDeck.id)) > 0 ? (
         <section className="resume-strip" aria-label="最近の学習">
           <div>
-            <span className="section-kicker">最近</span>
+            <span className="section-kicker">Recent</span>
             <strong>{recentDeck.title}</strong>
             <small>
               {formatDateTime(getLastActivity(state.progressMap.get(recentDeck.id)))}
             </small>
           </div>
           <div className="action-row">
-            <RouterLink className="button button--primary" to={studyPath(recentDeck.id)}>
-              学習
-            </RouterLink>
+            {isIrregularVerbDeckId(recentDeck.id) ? (
+              <RouterLink
+                className="button button--ghost"
+                to={deckDetailPath(recentDeck.id)}
+              >
+                詳細
+              </RouterLink>
+            ) : (
+              <RouterLink
+                className="button button--primary"
+                to={studyPath(recentDeck.id)}
+              >
+                学習
+              </RouterLink>
+            )}
             <RouterLink className="button button--secondary" to={testPath(recentDeck.id)}>
               テスト
             </RouterLink>
@@ -139,7 +154,7 @@ export function DecksPage() {
         </section>
       ) : null}
 
-      <section className="deck-grid" aria-label="単語帳一覧">
+      <section className="deck-grid" aria-label="デッキ一覧">
         {state.decks.map((deck) => {
           const progress = state.progressMap.get(deck.id)
           const accuracy = formatPercent(
@@ -163,7 +178,7 @@ export function DecksPage() {
                     <dd>{progress?.totalStudied ?? 0}</dd>
                   </div>
                   <div>
-                    <dt>正答率</dt>
+                    <dt>正解率</dt>
                     <dd>{accuracy}</dd>
                   </div>
                 </dl>
@@ -172,9 +187,11 @@ export function DecksPage() {
                 <RouterLink className="button button--ghost" to={deckDetailPath(deck.id)}>
                   詳細
                 </RouterLink>
-                <RouterLink className="button button--primary" to={studyPath(deck.id)}>
-                  学習
-                </RouterLink>
+                {!isIrregularVerbDeckId(deck.id) ? (
+                  <RouterLink className="button button--primary" to={studyPath(deck.id)}>
+                    学習
+                  </RouterLink>
+                ) : null}
                 <RouterLink className="button button--secondary" to={testPath(deck.id)}>
                   テスト
                 </RouterLink>

@@ -1,4 +1,6 @@
+import { IRREGULAR_VERBS_DECK_ID } from '../features/irregular-verbs/constants'
 import type { Deck, DeckSummary, WordItem } from '../types'
+import { fetchIrregularVerbDeckSummary } from './irregularVerbRepository'
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null
@@ -10,7 +12,7 @@ function isStringArray(value: unknown): value is string[] {
 
 function readWordItem(value: unknown): WordItem {
   if (!isRecord(value)) {
-    throw new Error('単語データの形式が不正です。')
+    throw new Error('Invalid deck item payload.')
   }
 
   if (
@@ -18,7 +20,7 @@ function readWordItem(value: unknown): WordItem {
     typeof value.question !== 'string' ||
     typeof value.answer !== 'string'
   ) {
-    throw new Error('単語データの必須項目が不足しています。')
+    throw new Error('Deck item fields are invalid.')
   }
 
   return {
@@ -33,7 +35,7 @@ function readWordItem(value: unknown): WordItem {
 
 function readDeckSummary(value: unknown): DeckSummary {
   if (!isRecord(value)) {
-    throw new Error('単語帳一覧の形式が不正です。')
+    throw new Error('Invalid deck summary payload.')
   }
 
   if (
@@ -43,7 +45,7 @@ function readDeckSummary(value: unknown): DeckSummary {
     typeof value.version !== 'number' ||
     typeof value.itemCount !== 'number'
   ) {
-    throw new Error('単語帳一覧の必須項目が不足しています。')
+    throw new Error('Deck summary fields are invalid.')
   }
 
   return {
@@ -57,7 +59,7 @@ function readDeckSummary(value: unknown): DeckSummary {
 
 function readDeck(value: unknown): Deck {
   if (!isRecord(value) || !Array.isArray(value.items)) {
-    throw new Error('単語帳データの形式が不正です。')
+    throw new Error('Invalid deck payload.')
   }
 
   if (
@@ -66,7 +68,7 @@ function readDeck(value: unknown): Deck {
     typeof value.version !== 'number' ||
     typeof value.lang !== 'string'
   ) {
-    throw new Error('単語帳データの必須項目が不足しています。')
+    throw new Error('Deck fields are invalid.')
   }
 
   return {
@@ -84,20 +86,23 @@ async function fetchJson(path: string) {
   const response = await fetch(path)
 
   if (!response.ok) {
-    throw new Error(`データを取得できませんでした: ${response.status}`)
+    throw new Error(`Failed to fetch deck data: ${response.status}`)
   }
 
   return response.json() as Promise<unknown>
 }
 
 export async function fetchDeckSummaries() {
-  const data = await fetchJson('/decks/index.json')
+  const [data, irregularVerbSummary] = await Promise.all([
+    fetchJson('/decks/index.json'),
+    fetchIrregularVerbDeckSummary(IRREGULAR_VERBS_DECK_ID),
+  ])
 
   if (!Array.isArray(data)) {
-    throw new Error('単語帳一覧が配列ではありません。')
+    throw new Error('Deck summaries payload is invalid.')
   }
 
-  return data.map(readDeckSummary)
+  return [...data.map(readDeckSummary), irregularVerbSummary]
 }
 
 export async function fetchDeck(deckId: string) {

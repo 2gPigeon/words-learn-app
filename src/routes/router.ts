@@ -4,6 +4,7 @@ export type AppRoute =
   | { name: 'study'; deckId: string }
   | { name: 'test'; deckId: string }
   | { name: 'result'; sessionId: string }
+  | { name: 'irregularVerbResult'; sessionId: string }
   | { name: 'history' }
   | { name: 'settings' }
   | { name: 'notFound' }
@@ -39,6 +40,14 @@ export function parseRoute(pathname: string): AppRoute {
     return { name: 'result', sessionId: segments[1] }
   }
 
+  if (
+    segments.length === 3 &&
+    segments[0] === 'irregular-verbs' &&
+    segments[1] === 'result'
+  ) {
+    return { name: 'irregularVerbResult', sessionId: segments[2] }
+  }
+
   if (segments.length === 1 && segments[0] === 'history') {
     return { name: 'history' }
   }
@@ -68,4 +77,8 @@ export function testPath(deckId: string) {
 
 export function resultPath(sessionId: string) {
   return `/result/${encodeURIComponent(sessionId)}`
+}
+
+export function irregularVerbResultPath(sessionId: string) {
+  return `/irregular-verbs/result/${encodeURIComponent(sessionId)}`
 }

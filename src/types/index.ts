@@ -34,6 +34,23 @@ export interface Deck {
   items: WordItem[]
 }
 
+export interface IrregularVerbItem {
+  id: string
+  word: string
+  meaning: string
+  past: string
+  pastParticiple: string
+}
+
+export interface IrregularVerbDeck {
+  id: string
+  title: string
+  description?: string
+  version: number
+  itemCount: number
+  items: IrregularVerbItem[]
+}
+
 export interface DeckProgress {
   deckId: string
   lastStudiedAt: number

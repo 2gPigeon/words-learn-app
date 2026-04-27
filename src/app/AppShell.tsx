@@ -14,7 +14,8 @@ function isActive(route: AppRoute, target: 'decks' | 'history' | 'settings') {
       route.name === 'decks' ||
       route.name === 'deckDetail' ||
       route.name === 'study' ||
-      route.name === 'test'
+      route.name === 'test' ||
+      route.name === 'irregularVerbResult'
     )
   }
 
