@@ -1,6 +1,6 @@
 import type { Deck, WordItem } from '../types'
 
-const PRINTABLE_ROW_COUNT = 20
+const PRINTABLE_ROW_COUNT = 10
 
 function shuffleItems<T>(items: T[]) {
   const copy = [...items]
@@ -26,20 +26,23 @@ function selectPrintableItems(items: WordItem[], count: number) {
   return shuffleItems(items).slice(0, Math.min(count, items.length))
 }
 
-function renderRows(items: WordItem[], rowCount: number) {
+function renderRows(
+  items: WordItem[],
+  rowCount: number,
+  mode: 'answer-key' | 'test',
+) {
   return Array.from({ length: rowCount }, (_, index) => {
     const item = items[index]
+    const prompt = item
+      ? `<span class="sheet__number">${index + 1}.</span>${escapeHtml(item.answer)}`
+      : ''
+    const response =
+      item && mode === 'answer-key' ? escapeHtml(item.question) : ''
 
     return `
       <tr>
-        <td class="sheet__prompt">
-          ${
-            item
-              ? `<span class="sheet__number">${index + 1}.</span>${escapeHtml(item.answer)}`
-              : ''
-          }
-        </td>
-        <td class="sheet__blank"></td>
+        <td class="sheet__prompt">${prompt}</td>
+        <td class="sheet__response">${response}</td>
       </tr>
     `
   }).join('')
@@ -82,18 +85,19 @@ function buildPrintableHtml(deck: Deck, items: WordItem[]) {
       }
 
       body {
-        padding: 10mm;
+        padding: 8mm 10mm;
       }
 
       .page {
         width: 190mm;
         margin: 0 auto;
+        min-height: 279mm;
       }
 
       .page__header {
         display: grid;
-        gap: 4mm;
-        margin-bottom: 5mm;
+        gap: 3mm;
+        margin-bottom: 4mm;
       }
 
       .page__title {
@@ -117,15 +121,46 @@ function buildPrintableHtml(deck: Deck, items: WordItem[]) {
       .page__info {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 5mm;
-        margin-bottom: 5mm;
+        gap: 4mm;
       }
 
       .page__line {
-        min-height: 11mm;
-        padding: 2.5mm 3mm;
-        font-size: 11pt;
+        min-height: 9mm;
+        padding: 2mm 3mm;
+        font-size: 10pt;
         border: 1px solid #9ca3af;
+      }
+
+      .page__halves {
+        display: grid;
+        grid-template-rows: 1fr auto 1fr;
+        gap: 3.5mm;
+      }
+
+      .sheet {
+        display: grid;
+        align-content: start;
+        gap: 2.5mm;
+      }
+
+      .sheet__heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 4mm;
+      }
+
+      .sheet__heading h2 {
+        margin: 0;
+        font-size: 12pt;
+      }
+
+      .sheet__label {
+        color: #6b7280;
+        font-size: 9pt;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
       }
 
       table {
@@ -140,17 +175,17 @@ function buildPrintableHtml(deck: Deck, items: WordItem[]) {
       }
 
       th {
-        height: 10mm;
-        padding: 2mm 3mm;
-        font-size: 11pt;
+        height: 7.5mm;
+        padding: 1.5mm 2.5mm;
+        font-size: 10pt;
         text-align: left;
         background: #f3f4f6;
       }
 
       td {
-        height: 10.7mm;
-        padding: 2mm 3mm;
-        font-size: 11pt;
+        height: 7.6mm;
+        padding: 1.4mm 2.5mm;
+        font-size: 10pt;
         vertical-align: middle;
       }
 
@@ -159,8 +194,9 @@ function buildPrintableHtml(deck: Deck, items: WordItem[]) {
         font-weight: 700;
       }
 
-      .sheet__blank {
+      .sheet__response {
         width: 46%;
+        font-weight: 600;
       }
 
       .sheet__number {
@@ -169,8 +205,31 @@ function buildPrintableHtml(deck: Deck, items: WordItem[]) {
         color: #6b7280;
       }
 
+      .sheet--test .sheet__response {
+        color: transparent;
+      }
+
+      .page__fold {
+        display: flex;
+        align-items: center;
+        gap: 3mm;
+        color: #6b7280;
+        font-size: 8.5pt;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      .page__fold::before,
+      .page__fold::after {
+        flex: 1 1 auto;
+        height: 0;
+        border-top: 1px dashed #9ca3af;
+        content: "";
+      }
+
       .page__hint {
-        margin-top: 4mm;
+        margin-top: 3mm;
         color: #6b7280;
         font-size: 9pt;
       }
@@ -194,7 +253,7 @@ function buildPrintableHtml(deck: Deck, items: WordItem[]) {
     <main class="page">
       <header class="page__header">
         <div class="page__title">
-          <h1>${escapeHtml(deck.title)}</h1>
+          <h1>${escapeHtml(deck.title)} Fold Test</h1>
           <div class="page__meta">${generatedAt}</div>
         </div>
         <div class="page__info">
@@ -203,19 +262,47 @@ function buildPrintableHtml(deck: Deck, items: WordItem[]) {
         </div>
       </header>
 
-      <table aria-label="Printable vocabulary test">
-        <thead>
-          <tr>
-            <th>Japanese meaning</th>
-            <th>English</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${renderRows(items, PRINTABLE_ROW_COUNT)}
-        </tbody>
-      </table>
+      <section class="page__halves">
+        <section class="sheet sheet--answers" aria-label="Answer key">
+          <div class="sheet__heading">
+            <h2>Answer Key</h2>
+            <span class="sheet__label">Upper half</span>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Japanese meaning</th>
+                <th>English answer</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${renderRows(items, PRINTABLE_ROW_COUNT, 'answer-key')}
+            </tbody>
+          </table>
+        </section>
 
-      <p class="page__hint">Use the browser print dialog and choose "Save as PDF" if needed.</p>
+        <div class="page__fold">Fold here</div>
+
+        <section class="sheet sheet--test" aria-label="Printable vocabulary test">
+          <div class="sheet__heading">
+            <h2>Test</h2>
+            <span class="sheet__label">Lower half</span>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Japanese meaning</th>
+                <th>English</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${renderRows(items, PRINTABLE_ROW_COUNT, 'test')}
+            </tbody>
+          </table>
+        </section>
+      </section>
+
+      <p class="page__hint">Print or save as PDF, then fold the sheet along the center line.</p>
     </main>
 
     <script>
