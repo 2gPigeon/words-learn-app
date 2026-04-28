@@ -89,9 +89,9 @@ function buildPrintableHtml(deck: Deck, items: WordItem[]) {
       }
 
       .page {
-        width: 190mm;
+        width: 186mm;
         margin: 0 auto;
-        min-height: 279mm;
+        min-height: 277mm;
       }
 
       .page__header {
@@ -397,9 +397,9 @@ function buildIrregularVerbPrintableHtml(
       }
 
       .page {
-        width: 190mm;
+        width: 186mm;
         margin: 0 auto;
-        min-height: 279mm;
+        min-height: 277mm;
       }
 
       .page__header {
@@ -494,7 +494,7 @@ function buildIrregularVerbPrintableHtml(
       }
 
       .sheet__col--meaning {
-        width: 61%;
+        width: 57%;
       }
 
       .sheet__col--word {
@@ -502,11 +502,11 @@ function buildIrregularVerbPrintableHtml(
       }
 
       .sheet__col--past {
-        width: 13%;
+        width: 15%;
       }
 
       .sheet__col--past-participle {
-        width: 13%;
+        width: 15%;
       }
 
       .sheet__number {
