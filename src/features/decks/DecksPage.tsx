@@ -133,12 +133,20 @@ export function DecksPage() {
           </div>
           <div className="action-row">
             {isIrregularVerbDeckId(recentDeck.id) ? (
-              <RouterLink
-                className="button button--ghost"
-                to={deckDetailPath(recentDeck.id)}
-              >
-                詳細
-              </RouterLink>
+              <>
+                <RouterLink
+                  className="button button--ghost"
+                  to={deckDetailPath(recentDeck.id)}
+                >
+                  詳細
+                </RouterLink>
+                <RouterLink
+                  className="button button--primary"
+                  to={studyPath(recentDeck.id)}
+                >
+                  学習
+                </RouterLink>
+              </>
             ) : (
               <RouterLink
                 className="button button--primary"
@@ -187,11 +195,9 @@ export function DecksPage() {
                 <RouterLink className="button button--ghost" to={deckDetailPath(deck.id)}>
                   詳細
                 </RouterLink>
-                {!isIrregularVerbDeckId(deck.id) ? (
-                  <RouterLink className="button button--primary" to={studyPath(deck.id)}>
-                    学習
-                  </RouterLink>
-                ) : null}
+                <RouterLink className="button button--primary" to={studyPath(deck.id)}>
+                  学習
+                </RouterLink>
                 <RouterLink className="button button--secondary" to={testPath(deck.id)}>
                   テスト
                 </RouterLink>

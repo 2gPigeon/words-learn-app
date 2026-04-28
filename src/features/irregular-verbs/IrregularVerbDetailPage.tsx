@@ -5,7 +5,7 @@ import { RouterLink } from '../../components/RouterLink'
 import { fetchIrregularVerbDeck } from '../../repositories/irregularVerbRepository'
 import { getWordProgressForDeck } from '../../repositories/progressRepository'
 import { openIrregularVerbPrintableTest } from '../../services/printableTest'
-import { testPath } from '../../routes/router'
+import { studyPath, testPath } from '../../routes/router'
 import type { IrregularVerbDeck, WordProgress } from '../../types'
 
 type DetailState =
@@ -123,7 +123,10 @@ export function IrregularVerbDetailPage({
             </div>
           </dl>
           <div className="action-row">
-            <RouterLink className="button button--primary" to={testPath(deckId)}>
+            <RouterLink className="button button--primary" to={studyPath(deckId)}>
+              学習する
+            </RouterLink>
+            <RouterLink className="button button--secondary" to={testPath(deckId)}>
               テストする
             </RouterLink>
             <button

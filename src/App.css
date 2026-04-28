@@ -459,6 +459,13 @@ dd {
   font-size: 56px;
 }
 
+.study-card__meaning {
+  color: var(--muted);
+  font-size: 20px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
 .answer-box {
   display: grid;
   gap: 4px;
@@ -478,6 +485,16 @@ dd {
 .answer-box strong {
   font-size: 28px;
   overflow-wrap: anywhere;
+}
+
+.answer-box__forms {
+  display: grid;
+  gap: 12px;
+}
+
+.answer-box__line {
+  display: grid;
+  gap: 4px;
 }
 
 .answer-box p {
@@ -762,8 +779,26 @@ dd {
     padding: 16px 14px calc(14px + env(safe-area-inset-bottom));
   }
 
+  .app-shell--focus .study-card {
+    gap: 14px;
+    padding: 16px 14px;
+  }
+
   .app-shell--focus .test-card h2 {
     font-size: 30px;
+  }
+
+  .app-shell--focus .study-card h2 {
+    font-size: 30px;
+  }
+
+  .app-shell--focus .study-card__meaning {
+    font-size: 18px;
+  }
+
+  .app-shell--focus .answer-box {
+    min-height: 88px;
+    padding: 14px;
   }
 
   .app-shell--focus .feedback {

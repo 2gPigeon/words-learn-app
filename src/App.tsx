@@ -7,6 +7,7 @@ import { DecksPage } from './features/decks/DecksPage'
 import { HistoryPage } from './features/history/HistoryPage'
 import { IrregularVerbDetailPage } from './features/irregular-verbs/IrregularVerbDetailPage'
 import { IrregularVerbResultPage } from './features/irregular-verbs/IrregularVerbResultPage'
+import { IrregularVerbStudyPage } from './features/irregular-verbs/IrregularVerbStudyPage'
 import { IrregularVerbTestPage } from './features/irregular-verbs/IrregularVerbTestPage'
 import { isIrregularVerbDeckId } from './features/irregular-verbs/constants'
 import { SettingsPage } from './features/settings/SettingsPage'
@@ -82,7 +83,7 @@ function App() {
         return <DeckDetailPage deckId={route.deckId} />
       case 'study':
         if (isIrregularVerbDeckId(route.deckId)) {
-          return <IrregularVerbDetailPage deckId={route.deckId} />
+          return <IrregularVerbStudyPage deckId={route.deckId} />
         }
         return <StudyPage deckId={route.deckId} />
       case 'test':

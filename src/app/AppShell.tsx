@@ -23,7 +23,7 @@ function isActive(route: AppRoute, target: 'decks' | 'history' | 'settings') {
 }
 
 function isFocusMode(route: AppRoute) {
-  return route.name === 'test'
+  return route.name === 'test' || route.name === 'study'
 }
 
 export function AppShell({ route, children }: AppShellProps) {

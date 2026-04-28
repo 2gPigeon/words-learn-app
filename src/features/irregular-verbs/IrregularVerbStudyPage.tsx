@@ -3,21 +3,25 @@ import { ErrorState, LoadingState } from '../../components/PageStates'
 import { ProgressBar } from '../../components/ProgressBar'
 import { RouterLink } from '../../components/RouterLink'
 import { formatDateTime } from '../../lib/utils/format'
-import { fetchDeck } from '../../repositories/deckRepository'
+import { fetchIrregularVerbDeck } from '../../repositories/irregularVerbRepository'
 import {
   getWordProgressForDeck,
   recordStudyRating,
 } from '../../repositories/progressRepository'
 import { deckDetailPath, testPath } from '../../routes/router'
 import { familiarityLabels } from '../../services/mastery'
-import type { Deck, FamiliarityRating, WordProgress } from '../../types'
+import type {
+  FamiliarityRating,
+  IrregularVerbDeck,
+  WordProgress,
+} from '../../types'
 
 type StudyState =
   | { status: 'loading' }
-  | { status: 'ready'; deck: Deck; progress: WordProgress[] }
+  | { status: 'ready'; deck: IrregularVerbDeck; progress: WordProgress[] }
   | { status: 'error'; message: string }
 
-interface StudyPageProps {
+interface IrregularVerbStudyPageProps {
   deckId: string
 }
 
@@ -34,7 +38,9 @@ function mergeProgress(
   return progress.map((item) => (item.wordId === updated.wordId ? updated : item))
 }
 
-export function StudyPage({ deckId }: StudyPageProps) {
+export function IrregularVerbStudyPage({
+  deckId,
+}: IrregularVerbStudyPageProps) {
   const [state, setState] = useState<StudyState>({ status: 'loading' })
   const [index, setIndex] = useState(0)
   const [showAnswer, setShowAnswer] = useState(false)
@@ -51,7 +57,7 @@ export function StudyPage({ deckId }: StudyPageProps) {
 
       try {
         const [deck, progress] = await Promise.all([
-          fetchDeck(deckId),
+          fetchIrregularVerbDeck(deckId),
           getWordProgressForDeck(deckId),
         ])
 
@@ -63,7 +69,9 @@ export function StudyPage({ deckId }: StudyPageProps) {
           setState({
             status: 'error',
             message:
-              error instanceof Error ? error.message : '不明なエラーです。',
+              error instanceof Error
+                ? error.message
+                : 'Failed to load irregular verb study.',
           })
         }
       }
@@ -84,7 +92,7 @@ export function StudyPage({ deckId }: StudyPageProps) {
   }, [state])
 
   if (state.status === 'loading') {
-    return <LoadingState label="学習データを読み込み中" />
+    return <LoadingState label="Loading irregular verb study" />
   }
 
   if (state.status === 'error') {
@@ -97,7 +105,12 @@ export function StudyPage({ deckId }: StudyPageProps) {
   }
 
   if (state.deck.items.length === 0) {
-    return <ErrorState title="単語がありません" message="単語帳データを確認してください。" />
+    return (
+      <ErrorState
+        title="単語がありません"
+        message="不規則動詞データを確認してください。"
+      />
+    )
   }
 
   const current = state.deck.items[index]
@@ -152,13 +165,23 @@ export function StudyPage({ deckId }: StudyPageProps) {
 
       <article className="study-card">
         <div className="study-card__meta">
+          <span>Irregular verb</span>
           <strong>{familiarityLabels[currentProgress?.familiarity ?? 0]}</strong>
         </div>
-        <h2>{current.question}</h2>
+        <h2>{current.word}</h2>
+        <p className="study-card__meaning">{current.meaning}</p>
         <div className={`answer-box ${showAnswer ? 'is-open' : ''}`}>
-          <span>答え</span>
-          <strong>{showAnswer ? current.answer : '••••••'}</strong>
-          {showAnswer && current.note ? <p>{current.note}</p> : null}
+          <span>活用</span>
+          <div className="answer-box__forms">
+            <div className="answer-box__line">
+              <span>過去形</span>
+              <strong>{showAnswer ? current.past : '••••••'}</strong>
+            </div>
+            <div className="answer-box__line">
+              <span>過去分詞形</span>
+              <strong>{showAnswer ? current.pastParticiple : '••••••'}</strong>
+            </div>
+          </div>
         </div>
         <button
           className="button button--primary"
