@@ -13,4 +13,26 @@
     "version": 1,
     "itemCount": 346
   }
+  ,
+  {
+    "id": "gra1-term1",
+    "title": "中学1年生1学期",
+    "description": "中学1年生1学期で習う単語・熟語",
+    "version": 1,
+    "itemCount": 190
+  },
+  {
+    "id": "gra2-term1",
+    "title": "中学2年生1学期",
+    "description": "中学2年生1学期で習う単語・熟語",
+    "version": 1,
+    "itemCount": 115
+  },
+  {
+    "id": "gra3-term1",
+    "title": "中学3年生1学期",
+    "description": "中学3年生1学期で習う単語・熟語",
+    "version": 1,
+    "itemCount": 104
+  }
 ]
