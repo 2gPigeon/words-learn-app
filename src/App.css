@@ -244,8 +244,18 @@ h2 {
 }
 
 .deck-card__actions {
+  gap: 8px;
   padding: 16px 20px 20px;
   border-top: 1px solid var(--border);
+}
+
+.deck-card__actions .button {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 38px;
+  padding: 7px 8px;
+  font-size: 14px;
+  white-space: nowrap;
 }
 
 .action-row--right {
