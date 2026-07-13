@@ -2,6 +2,120 @@ import type { Deck, IrregularVerbDeck, IrregularVerbItem, WordItem } from '../ty
 
 const PRINTABLE_ROW_COUNT = 10
 
+function writePopupDocument(popup: Window, html: string) {
+  popup.document.open()
+  popup.document.write(html)
+  popup.document.close()
+}
+
+function buildPrintableStatusHtml(status: 'loading' | 'error') {
+  const isLoading = status === 'loading'
+  const title = isLoading ? '印刷データを準備中…' : '印刷データを読み込めませんでした。'
+  const description = isLoading
+    ? '準備が完了すると、印刷画面が自動的に表示されます。'
+    : '元の画面に戻って再度お試しください。'
+
+  return `<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>${title}</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        min-height: 100%;
+        margin: 0;
+      }
+
+      body {
+        display: grid;
+        place-items: center;
+        padding: 24px;
+        color: #17202a;
+        font-family:
+          "Yu Gothic",
+          "Hiragino Kaku Gothic ProN",
+          "Noto Sans JP",
+          sans-serif;
+        background: #f4f8fb;
+      }
+
+      main {
+        width: min(100%, 520px);
+        padding: 40px;
+        text-align: center;
+        background: #ffffff;
+        border: 1px solid #d8dee8;
+        border-radius: 12px;
+        box-shadow: 0 18px 50px rgb(23 32 42 / 10%);
+      }
+
+      .spinner {
+        width: 42px;
+        height: 42px;
+        margin: 0 auto 22px;
+        border: 4px solid #d9edf7;
+        border-top-color: #168fd0;
+        border-radius: 50%;
+        animation: spin 800ms linear infinite;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(20px, 4vw, 28px);
+      }
+
+      p {
+        margin: 14px 0 0;
+        color: #667085;
+        line-height: 1.7;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .spinner {
+          animation: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main role="${isLoading ? 'status' : 'alert'}">
+      ${isLoading ? '<div class="spinner" aria-hidden="true"></div>' : ''}
+      <h1>${title}</h1>
+      <p>${description}</p>
+    </main>
+  </body>
+</html>`
+}
+
+export function openPrintableTestWindow() {
+  const popup = window.open('', '_blank')
+
+  if (!popup) {
+    throw new Error('Unable to open the print preview window.')
+  }
+
+  writePopupDocument(popup, buildPrintableStatusHtml('loading'))
+  return popup
+}
+
+export function showPrintableTestError(popup: Window) {
+  if (!popup.closed) {
+    writePopupDocument(popup, buildPrintableStatusHtml('error'))
+  }
+}
+
 function shuffleItems<T>(items: T[]) {
   const copy = [...items]
 
@@ -321,10 +435,16 @@ export function openPrintableTest(deck: Deck) {
     throw new Error('Unable to open the print preview window.')
   }
 
+  renderPrintableTest(popup, deck)
+}
+
+export function renderPrintableTest(popup: Window, deck: Deck) {
+  if (deck.items.length === 0) {
+    throw new Error('No words are available in this deck.')
+  }
+
   const items = selectPrintableItems(deck.items, PRINTABLE_ROW_COUNT)
-  popup.document.open()
-  popup.document.write(buildPrintableHtml(deck, items))
-  popup.document.close()
+  writePopupDocument(popup, buildPrintableHtml(deck, items))
 }
 
 function renderIrregularVerbRows(
@@ -643,8 +763,17 @@ export function openIrregularVerbPrintableTest(deck: IrregularVerbDeck) {
     throw new Error('Unable to open the print preview window.')
   }
 
+  renderIrregularVerbPrintableTest(popup, deck)
+}
+
+export function renderIrregularVerbPrintableTest(
+  popup: Window,
+  deck: IrregularVerbDeck,
+) {
+  if (deck.items.length === 0) {
+    throw new Error('No irregular verbs are available in this deck.')
+  }
+
   const items = selectPrintableItems(deck.items, PRINTABLE_ROW_COUNT)
-  popup.document.open()
-  popup.document.write(buildIrregularVerbPrintableHtml(deck, items))
-  popup.document.close()
+  writePopupDocument(popup, buildIrregularVerbPrintableHtml(deck, items))
 }

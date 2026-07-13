@@ -3,9 +3,16 @@ import { ErrorState, LoadingState } from '../../components/PageStates'
 import { RouterLink } from '../../components/RouterLink'
 import { isIrregularVerbDeckId } from '../../features/irregular-verbs/constants'
 import { formatDateTime, formatPercent } from '../../lib/utils/format'
-import { fetchDeckSummaries } from '../../repositories/deckRepository'
+import { fetchDeck, fetchDeckSummaries } from '../../repositories/deckRepository'
+import { fetchIrregularVerbDeck } from '../../repositories/irregularVerbRepository'
 import { getDeckProgressMap } from '../../repositories/progressRepository'
 import { deckDetailPath, studyPath, testPath } from '../../routes/router'
+import {
+  openPrintableTestWindow,
+  renderIrregularVerbPrintableTest,
+  renderPrintableTest,
+  showPrintableTestError,
+} from '../../services/printableTest'
 import type { DeckProgress, DeckSummary } from '../../types'
 
 type DecksState =
@@ -28,6 +35,9 @@ function getLastActivity(progress: DeckProgress | undefined) {
 export function DecksPage() {
   const [state, setState] = useState<DecksState>({ status: 'loading' })
   const [reloadKey, setReloadKey] = useState(0)
+  const [printingDeckIds, setPrintingDeckIds] = useState<Set<string>>(
+    () => new Set(),
+  )
 
   useEffect(() => {
     let active = true
@@ -93,6 +103,39 @@ export function DecksPage() {
       getLastActivity(state.progressMap.get(right.id)) -
       getLastActivity(state.progressMap.get(left.id)),
   )[0]
+
+  async function handleOpenPrintableTest(deck: DeckSummary) {
+    setPrintingDeckIds((current) => new Set(current).add(deck.id))
+    let popup: Window | null = null
+
+    try {
+      popup = openPrintableTestWindow()
+
+      if (isIrregularVerbDeckId(deck.id)) {
+        const printableDeck = await fetchIrregularVerbDeck(deck.id)
+        renderIrregularVerbPrintableTest(popup, printableDeck)
+      } else {
+        const printableDeck = await fetchDeck(deck.id)
+        renderPrintableTest(popup, printableDeck)
+      }
+    } catch (error) {
+      if (popup) {
+        showPrintableTestError(popup)
+      } else {
+        window.alert(
+          error instanceof Error
+            ? error.message
+            : '印刷ページを開けませんでした。',
+        )
+      }
+    } finally {
+      setPrintingDeckIds((current) => {
+        const next = new Set(current)
+        next.delete(deck.id)
+        return next
+      })
+    }
+  }
 
   return (
     <section className="page-stack">
@@ -192,7 +235,10 @@ export function DecksPage() {
                 </dl>
               </div>
               <div className="deck-card__actions">
-                <RouterLink className="button button--ghost" to={deckDetailPath(deck.id)}>
+                <RouterLink
+                  className="button button--ghost deck-card__wide-action"
+                  to={deckDetailPath(deck.id)}
+                >
                   詳細
                 </RouterLink>
                 <RouterLink className="button button--primary" to={studyPath(deck.id)}>
@@ -201,6 +247,14 @@ export function DecksPage() {
                 <RouterLink className="button button--secondary" to={testPath(deck.id)}>
                   テスト
                 </RouterLink>
+                <button
+                  className="button button--print deck-card__wide-action"
+                  type="button"
+                  disabled={printingDeckIds.has(deck.id)}
+                  onClick={() => void handleOpenPrintableTest(deck)}
+                >
+                  {printingDeckIds.has(deck.id) ? '準備中…' : '印刷'}
+                </button>
               </div>
             </article>
           )
